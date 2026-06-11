@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #f9fafb;
+  color: #111827;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
+}
