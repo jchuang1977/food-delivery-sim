@@ -112,9 +112,9 @@ export default function OrderPage() {
     if (!cartRef.current) return
     const bar = cartRef.current
     if (totalItems > 0) {
-      gsap.to(bar, { y: 0, opacity: 1, duration: 0.4, ease: 'back.out(1.7)' })
+      gsap.to(bar, { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.7)' })
     } else {
-      gsap.to(bar, { y: 30, opacity: 0, duration: 0.2 })
+      gsap.to(bar, { y: -10, opacity: 0, scale: 0.95, duration: 0.2 })
     }
   }, [totalItems])
 
@@ -167,6 +167,17 @@ export default function OrderPage() {
         />
       </div>
 
+      <div ref={cartRef} className="cart-summary" style={{ opacity: 0, scale: 0.95 }}>
+        <div className="cart-summary-left">
+          <span className="cart-summary-count">{totalItems} 項</span>
+          <span className="cart-summary-divider" />
+          <span className="cart-summary-price">${totalPrice}</span>
+        </div>
+        <button className="cart-summary-btn" onClick={() => dispatch({ type: 'SET_PAGE', payload: 'checkout' })}>
+          結帳 →
+        </button>
+      </div>
+
       <div ref={listRef} className="restaurant-list">
         {filtered.length === 0 && (
           <div className="empty-state">
@@ -178,7 +189,7 @@ export default function OrderPage() {
           <div
             key={r.id}
             className="restaurant-card"
-            onClick={() => setShowDetail(r)}
+            onClick={() => { setShowDetail(r); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
           >
             <div className="card-emoji">{r.emoji}</div>
             <div className="card-body">
@@ -206,17 +217,6 @@ export default function OrderPage() {
             </div>
           </div>
         ))}
-      </div>
-
-      <div ref={cartRef} className="cart-summary" style={{ transform: 'translateY(30px)', opacity: 0 }}>
-        <div className="cart-summary-left">
-          <span className="cart-summary-count">{totalItems} 項</span>
-          <span className="cart-summary-divider" />
-          <span className="cart-summary-price">${totalPrice}</span>
-        </div>
-        <button className="cart-summary-btn" onClick={() => dispatch({ type: 'SET_PAGE', payload: 'checkout' })}>
-          結帳 →
-        </button>
       </div>
 
       {showDetail && (
