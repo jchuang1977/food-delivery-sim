@@ -28,7 +28,7 @@
 .topbar-title {
   font-size: 18px;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
 }
 
 .checkout-body {
@@ -83,7 +83,7 @@
 .cci-name {
   font-size: 14px;
   font-weight: 600;
-  color: white;
+  color: var(--text-primary);
 }
 
 .cci-restaurant {
@@ -120,13 +120,13 @@
 
 .qty-btn:hover {
   background: var(--bg-hover);
-  color: white;
+  color: var(--text-primary);
 }
 
 .qty-num {
   font-size: 14px;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
   min-width: 20px;
   text-align: center;
 }
@@ -134,7 +134,7 @@
 .cci-price {
   font-size: 16px;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
   min-width: 60px;
   text-align: right;
 }
@@ -245,14 +245,14 @@
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 24px rgba(28,26,24,0.12);
   z-index: 50;
 }
 
 .checkout-bar-total {
   font-size: 22px;
   font-weight: 800;
-  color: white;
+  color: var(--text-primary);
 }
 
 .checkout-bar-btn {
@@ -274,7 +274,7 @@
   position: fixed;
   inset: 0;
   z-index: 300;
-  background: rgba(0,0,0,0.7);
+  background: rgba(28,26,24,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -307,7 +307,7 @@
 
 .confirm-modal h3 {
   font-size: 22px;
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
@@ -328,7 +328,7 @@
 .confirm-total {
   font-size: 16px;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
 }
 
 .confirm-note {

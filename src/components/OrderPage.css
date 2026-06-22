@@ -11,8 +11,8 @@
   justify-content: center;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 80% 60% at 30% 40%, rgba(255, 107, 53, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 50% at 70% 60%, rgba(0, 212, 170, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 30% 40%, rgba(255, 107, 53, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 70% 60%, rgba(0, 184, 148, 0.04) 0%, transparent 60%),
     var(--bg-primary);
   visibility: hidden;
 }
@@ -21,8 +21,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(28,26,24,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28,26,24,0.04) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse 70% 70% at center, black 30%, transparent 70%);
   -webkit-mask-image: radial-gradient(ellipse 70% 70% at center, black 30%, transparent 70%);
@@ -40,7 +40,7 @@
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
@@ -188,7 +188,7 @@
 .card-name {
   font-size: 18px;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
 }
 
 .card-category {
@@ -297,7 +297,7 @@
 .cart-summary-price {
   font-size: 20px;
   font-weight: 800;
-  color: white;
+  color: var(--text-primary);
 }
 
 .cart-summary-btn {

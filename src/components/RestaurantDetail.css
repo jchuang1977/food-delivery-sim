@@ -60,7 +60,7 @@
 .detail-name {
   font-size: 20px;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
 }
 
 .detail-category {
@@ -85,7 +85,7 @@
 .detail-rating-num {
   font-weight: 700;
   font-size: 14px;
-  color: white;
+  color: var(--text-primary);
 }
 
 .detail-body {
@@ -159,7 +159,7 @@
 .menu-item-name {
   font-size: 14px;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
   display: block;
   margin-bottom: 2px;
 }
@@ -214,7 +214,7 @@
 .menu-price {
   font-size: 18px;
   font-weight: 800;
-  color: white;
+  color: var(--text-primary);
 }
 
 .menu-add-btn {

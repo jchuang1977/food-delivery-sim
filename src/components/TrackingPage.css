@@ -15,11 +15,34 @@
 
 .tracking-page {
   min-height: 100vh;
-  background: var(--bg-primary);
+  background: #14141a;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
+}
+
+.tracking-page .game-hud-top {
+  background: #1e1e26;
+  border-bottom-color: #2a2a34;
+}
+
+.tracking-page .road-bg {
+  background: linear-gradient(0deg, #1a1a22 0%, transparent 100%);
+}
+
+.tracking-page .world-grid {
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(0,212,170,0.03) 0%, transparent 60%),
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  animation: gridFloat 4s ease-in-out infinite;
+}
+
+.tracking-page .game-footer {
+  background: #1e1e26;
+  border-top-color: #2a2a34;
 }
 
 .game-hud-top {
@@ -312,8 +335,8 @@
 }
 
 .game-btn.secondary:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+  background: #2e2e38;
+  color: #e4e4e7;
 }
 
 .game-btn.primary {
