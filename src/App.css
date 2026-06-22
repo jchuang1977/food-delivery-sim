@@ -1,40 +1,29 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.app {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
-body {
-  font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: #f9fafb;
-  color: #111827;
-  overflow-x: hidden;
+.page-container {
+  position: relative;
+  min-height: 100vh;
 }
 
-button {
-  font-family: inherit;
-  transition: opacity 0.15s;
+.page-enter {
+  position: absolute;
+  inset: 0;
 }
 
-button:active {
-  opacity: 0.8;
+.page-exit {
+  position: absolute;
+  inset: 0;
 }
 
-input, textarea {
-  font-family: inherit;
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 4px;
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
 }

@@ -1,289 +1,334 @@
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes roadScroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(30px); }
+}
+
+@keyframes gridFloat {
+  0%, 100% { opacity: 0.02; }
+  50% { opacity: 0.06; }
+}
+
 .tracking-page {
-  background: #f0fdf4;
   min-height: 100vh;
-  padding-bottom: 40px;
-}
-
-.tracking-demo-banner {
-  background: #fef3c7;
-  color: #92400e;
-  padding: 8px 16px;
-  font-size: 12px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.map-container {
-  margin: 12px 16px;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
-
-.map-grid {
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
   position: relative;
-  width: 100%;
-  padding-top: 80%;
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 50%, #6ee7b7 100%);
+  overflow: hidden;
 }
 
-.map-roads {
-  position: absolute;
-  inset: 0;
-}
-
-.road {
-  position: absolute;
-  background: rgba(255,255,255,0.6);
-}
-
-.road-h {
-  width: 100%;
-  height: 3px;
-}
-
-.road-v {
-  width: 3px;
-  height: 100%;
-}
-
-.map-marker {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform: translate(-50%, -50%);
-  z-index: 5;
-}
-
-.marker-icon {
-  font-size: 28px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-}
-
-.marker-label {
-  font-size: 10px;
-  font-weight: 700;
-  background: rgba(255,255,255,0.9);
-  padding: 1px 6px;
-  border-radius: 6px;
-  margin-top: 2px;
-  white-space: nowrap;
-}
-
-.marker-delivery {
-  z-index: 10;
-  transition: left 0.7s ease, top 0.7s ease;
-}
-
-.delivery-icon {
-  font-size: 36px;
-}
-
-@keyframes floatBike {
-  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
-  50% { transform: translate(-50%, -50%) translateY(-6px); }
-}
-
-.floating {
-  animation: floatBike 2s ease-in-out infinite;
-}
-
-.delivery-path {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.path-svg {
-  width: 100%;
-  height: 100%;
-}
-
-.tracking-info {
-  margin: 0 16px;
-  background: white;
-  border-radius: 16px;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.tracking-eta {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.eta-number {
-  font-size: 32px;
-  font-weight: 900;
-  color: #0ea768;
-}
-
-.eta-label {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.tracking-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  margin-left: 16px;
-}
-
-.status-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.status-text {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-}
-
-.tracking-progress {
-  margin: 12px 16px;
-  background: white;
-  border-radius: 16px;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.progress-stage {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: #9ca3af;
-  font-weight: 600;
-  flex: 1;
-}
-
-.progress-stage.done {
-  color: #0ea768;
-}
-
-.progress-dot {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.progress-stage.done .progress-dot {
-  background: #d1fae5;
-}
-
-.delivery-person-card {
-  margin: 12px 16px;
-  background: white;
-  border-radius: 16px;
-  padding: 14px;
+.game-hud-top {
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
 }
 
-.person-avatar {
-  width: 48px;
-  height: 48px;
+.hud-corner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 60px;
+}
+
+.hud-corner.right {
+  align-items: flex-end;
+}
+
+.hud-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.hud-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.pulsing {
+  animation: pulse 1.2s infinite;
+}
+
+.hud-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.boss-bar {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  overflow: visible;
+}
+
+.boss-fill {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  bottom: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), #ff8c5a);
+  border-radius: 11px;
+  transition: none;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.boss-segments {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  padding: 0 4px;
+  pointer-events: none;
+}
+
+.boss-seg {
+  flex: 1;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  height: 100%;
+}
+
+.boss-seg:last-child {
+  border-right: none;
+}
+
+.boss-character {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  z-index: 5;
+  filter: drop-shadow(0 0 8px rgba(255,107,53,0.6));
+  pointer-events: none;
+  left: 0%;
+}
+
+.game-world {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.road-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(0deg, var(--bg-surface) 0%, transparent 100%);
+  overflow: hidden;
+}
+
+.road-lines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 14px,
+    rgba(255,255,255,0.04) 14px,
+    rgba(255,255,255,0.04) 16px
+  );
+  animation: roadScroll 1.5s linear infinite;
+}
+
+.road-lines.second {
+  animation-delay: -0.75s;
+  opacity: 0.5;
+}
+
+.world-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(0,212,170,0.03) 0%, transparent 60%),
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  animation: gridFloat 4s ease-in-out infinite;
+}
+
+.quest-log {
+  position: absolute;
+  top: 90px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 10;
+  max-width: 280px;
+}
+
+.quest-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(20, 20, 24, 0.85);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(8px);
+}
+
+.quest-check {
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--cyan);
 }
 
-.person-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.quest-emoji {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.quest-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
   flex: 1;
 }
 
-.person-info strong {
-  font-size: 15px;
+.quest-time {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  flex-shrink: 0;
 }
 
-.person-info span {
-  font-size: 12px;
-  color: #6b7280;
+.quest-complete {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  z-index: 20;
+  text-align: center;
+  visibility: hidden;
 }
 
-.call-btn {
-  padding: 8px 14px;
-  background: #f3f4f6;
-  border: none;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
+.complete-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(0,212,170,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
 }
 
-.tracking-order-info {
-  margin: 12px 16px;
-  background: white;
-  border-radius: 16px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.complete-icon {
+  display: block;
+  font-size: 64px;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 20px rgba(0,212,170,0.5));
 }
 
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: #4b5563;
-}
-
-.info-row strong {
-  color: #111827;
-}
-
-.tracking-footer {
-  padding: 16px;
-}
-
-.finish-btn {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 16px;
+.complete-title {
+  font-size: 32px;
+  font-weight: 800;
   color: white;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
+  letter-spacing: -0.03em;
 }
 
-.cancel-btn {
-  width: 100%;
+.complete-desc {
+  font-size: 16px;
+  color: var(--cyan);
+  margin-top: 4px;
+}
+
+.particles-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.game-footer {
+  display: flex;
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  z-index: 10;
+}
+
+.game-btn {
+  flex: 1;
   padding: 14px;
-  border: 2px solid #ef4444;
-  border-radius: 16px;
-  background: white;
-  color: #ef4444;
   font-size: 14px;
   font-weight: 700;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.game-btn.secondary {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.game-btn.secondary:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.game-btn.primary {
+  background: var(--text-muted);
+  color: var(--bg-primary);
+  cursor: default;
+}
+
+.game-btn.primary.active {
+  background: var(--accent);
+  color: white;
   cursor: pointer;
+}
+
+.game-btn.primary.active:hover {
+  background: #ff8255;
+  box-shadow: 0 0 20px var(--accent-glow);
 }

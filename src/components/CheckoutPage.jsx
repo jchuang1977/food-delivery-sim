@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import { useApp } from '../context/AppContext'
 import { restaurants } from '../data/restaurants'
 import './CheckoutPage.css'
 
+gsap.registerPlugin(useGSAP)
+
 export default function CheckoutPage() {
-  const { state, dispatch, themes } = useApp()
-  const theme = themes[state.theme]
+  const { state, dispatch } = useApp()
   const [form, setForm] = useState({
     name: '王小明',
     phone: '0912-345-678',
@@ -14,6 +17,10 @@ export default function CheckoutPage() {
   })
   const [payment, setPayment] = useState('card')
   const [showConfirm, setShowConfirm] = useState(false)
+
+  const bodyRef = useRef(null)
+  const totalRef = useRef(null)
+  const summaryRef = useRef(null)
 
   const subtotal = state.cart.reduce((s, i) => s + i.price * i.quantity, 0)
   const deliveryFee = state.cart.length > 0
@@ -24,6 +31,19 @@ export default function CheckoutPage() {
     : 0
   const serviceFee = Math.round(subtotal * 0.05)
   const total = subtotal + deliveryFee + serviceFee
+
+  useGSAP(() => {
+    const tl = gsap.timeline()
+    tl.from(bodyRef.current, { autoAlpha: 0, duration: 0.3 })
+    tl.from(bodyRef.current.querySelectorAll('.checkout-section'), {
+      y: 20, opacity: 0, stagger: 0.08, duration: 0.4, ease: 'power2.out',
+    }, '-=0.1')
+
+    if (summaryRef.current) {
+      const numbers = summaryRef.current.querySelectorAll('.price-num')
+      tl.from(numbers, { textContent: 0, duration: 0.6, ease: 'power1.out', snap: { textContent: 1 } }, '-=0.2')
+    }
+  }, { scope: bodyRef })
 
   const handleOrder = () => {
     dispatch({
@@ -40,63 +60,61 @@ export default function CheckoutPage() {
 
   const paymentLabels = {
     card: '💳 信用卡',
-    transfer: '🏦 銀行轉帳',
+    transfer: '🏦 轉帳',
     easy: '📱 行動支付',
   }
 
   return (
-    <div className="page checkout-page">
-      <header className="page-header" style={{ background: theme.primaryBtn }}>
-        <button className="back-btn" onClick={() => dispatch({ type: 'SET_PAGE', payload: 'order' })}>
+    <div className="checkout-page">
+      <div className="checkout-topbar">
+        <button className="topbar-back" onClick={() => dispatch({ type: 'SET_PAGE', payload: 'order' })}>
           ←
         </button>
-        <h2>確認訂單</h2>
-      </header>
+        <h2 className="topbar-title">結帳</h2>
+      </div>
 
-      <div className="checkout-body">
+      <div ref={bodyRef} className="checkout-body">
         <section className="checkout-section">
-          <h3>🛒 訂單內容</h3>
-          {state.cart.map((item, i) => (
-            <div key={i} className="cart-item">
-              <div className="cart-item-info">
-                <strong>{item.name}</strong>
-                {item.options && <span className="cart-item-opts">{item.options}</span>}
-                <span className="cart-item-restaurant">{item.restaurantName}</span>
-              </div>
-              <div className="cart-item-right">
-                <div className="cart-qty">
-                  <button onClick={() => dispatch({ type: 'UPDATE_CART_QTY', payload: { index: i, quantity: item.quantity - 1 } })}>−</button>
-                  <span>{item.quantity}</span>
-                  <button onClick={() => dispatch({ type: 'UPDATE_CART_QTY', payload: { index: i, quantity: item.quantity + 1 } })}>+</button>
+          <h3 className="section-label">訂單內容</h3>
+          <div className="checkout-cart">
+            {state.cart.map((item, i) => (
+              <div key={i} className="checkout-cart-item">
+                <div className="cci-info">
+                  <span className="cci-name">{item.name}</span>
+                  <span className="cci-restaurant">{item.restaurantName}</span>
                 </div>
-                <strong>${item.price * item.quantity}</strong>
+                <div className="cci-right">
+                  <div className="cci-qty">
+                    <button
+                      className="qty-btn"
+                      onClick={() => dispatch({ type: 'UPDATE_CART_QTY', payload: { index: i, quantity: item.quantity - 1 } })}
+                    >−</button>
+                    <span className="qty-num">{item.quantity}</span>
+                    <button
+                      className="qty-btn"
+                      onClick={() => dispatch({ type: 'UPDATE_CART_QTY', payload: { index: i, quantity: item.quantity + 1 } })}
+                    >+</button>
+                  </div>
+                  <span className="cci-price">${item.price * item.quantity}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </section>
 
         <section className="checkout-section">
-          <h3>📍 外送資訊</h3>
+          <h3 className="section-label">外送資訊</h3>
           <div className="form-group">
             <label>姓名</label>
-            <input
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
+            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </div>
           <div className="form-group">
             <label>電話</label>
-            <input
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            />
+            <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </div>
           <div className="form-group">
             <label>地址</label>
-            <input
-              value={form.address}
-              onChange={(e) => setForm({ ...form, address: e.target.value })}
-            />
+            <input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </div>
           <div className="form-group">
             <label>備註</label>
@@ -110,13 +128,12 @@ export default function CheckoutPage() {
         </section>
 
         <section className="checkout-section">
-          <h3>💰 付款方式</h3>
+          <h3 className="section-label">付款方式</h3>
           <div className="payment-options">
             {Object.entries(paymentLabels).map(([key, label]) => (
               <button
                 key={key}
-                className={`payment-btn ${payment === key ? 'active' : ''}`}
-                style={payment === key ? { background: theme.primaryBtn } : {}}
+                className={`payment-opt ${payment === key ? 'active' : ''}`}
                 onClick={() => setPayment(key)}
               >
                 {label}
@@ -125,51 +142,47 @@ export default function CheckoutPage() {
           </div>
         </section>
 
-        <section className="checkout-section price-breakdown">
+        <section ref={summaryRef} className="checkout-section price-summary">
           <div className="price-row">
             <span>小計</span>
-            <span>${subtotal}</span>
+            <span className="price-num" data-target={subtotal}>${subtotal}</span>
           </div>
           <div className="price-row">
             <span>運費</span>
-            <span>${deliveryFee}</span>
+            <span className="price-num" data-target={deliveryFee}>${deliveryFee}</span>
           </div>
           <div className="price-row">
             <span>服務費</span>
-            <span>${serviceFee}</span>
+            <span className="price-num" data-target={serviceFee}>${serviceFee}</span>
           </div>
-          <div className="price-row total">
+          <div className="price-row total-row">
             <span>總計</span>
-            <strong>${total}</strong>
+            <strong ref={totalRef} className="total-num">${total}</strong>
           </div>
         </section>
       </div>
 
-      <div className="checkout-footer" style={{ background: theme.primaryBtn }}>
-        <span className="footer-total">${total}</span>
-        <button className="order-btn" onClick={handleOrder}>
-          確認下單 🎉
+      <div className="checkout-bar">
+        <span className="checkout-bar-total">${total}</span>
+        <button className="checkout-bar-btn" onClick={handleOrder}>
+          下單 →
         </button>
       </div>
 
       {showConfirm && (
-        <div className="overlay">
-          <div className="confirm-modal pop-in">
-            <div className="confirm-icon">✅</div>
+        <div className="confirm-overlay">
+          <div className="confirm-modal">
+            <div className="confirm-icon">✓</div>
             <h3>訂單已成立！</h3>
             <div className="confirm-details">
-              <p><strong>付款方式：</strong>{paymentLabels[payment]}</p>
+              <p><strong>付款：</strong>{paymentLabels[payment]}</p>
               <p><strong>收件人：</strong>{form.name}</p>
               <p><strong>地址：</strong>{form.address}</p>
               <p className="confirm-total"><strong>金額：</strong>${total}</p>
             </div>
-            <p className="confirm-note">🎮 這是模擬外送，實際上不會送食物來喔！</p>
-            <button
-              className="confirm-btn"
-              style={{ background: theme.primaryBtn }}
-              onClick={handleConfirm}
-            >
-              開始追蹤外送員 🚴
+            <p className="confirm-note">這是模擬外送，不會真的送食物來 🎮</p>
+            <button className="confirm-btn" onClick={handleConfirm}>
+              開始追蹤 →
             </button>
           </div>
         </div>

@@ -1,224 +1,182 @@
-import { useState, useEffect, useRef } from 'react'
+import { useRef, useState } from 'react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import { useApp } from '../context/AppContext'
 import './TrackingPage.css'
 
-const RABBIT_CONFIG = {
-  label: '兔兔外送員',
-  emoji: '🐰',
-  totalSteps: 20,
-  intervalMs: 800,
-}
+gsap.registerPlugin(useGSAP)
 
-const ROCKET_CONFIG = {
-  label: '火箭外送員',
-  emoji: '🚀',
-  totalSteps: 15,
-  intervalMs: 600,
-}
-
-const STATUS_MESSAGES = [
-  '外送員正在準備美味的食物...',
-  '外送員剛從餐廳出發！',
-  '外送員正在趕路中...',
-  '外送員油門催到底了！',
-  '外送員快到了！',
-  '外送員已經到了！',
+const statusSteps = [
+  { emoji: '📋', text: '訂單已接收', time: '0:00' },
+  { emoji: '👨‍🍳', text: '餐廳正在準備', time: '0:45' },
+  { emoji: '📦', text: '餐點已打包', time: '1:30' },
+  { emoji: '🛵', text: '外送員已出發', time: '2:15' },
+  { emoji: '📍', text: '外送員即將抵達', time: '3:00' },
+  { emoji: '📸', text: '外送員抵達，拍照確認', time: '3:30' },
 ]
 
 export default function TrackingPage() {
-  const { state, dispatch, themes } = useApp()
-  const theme = themes[state.theme]
-  const config = state.deliveryMode === 'rabbit' ? RABBIT_CONFIG : ROCKET_CONFIG
-  const [progress, setProgress] = useState(0)
-  const [pos, setPos] = useState({ x: 15, y: 20 })
-  const [statusIdx, setStatusIdx] = useState(0)
-  const [eta, setEta] = useState(Math.ceil(config.totalSteps * config.intervalMs / 1000))
-  const [complete, setComplete] = useState(false)
-  const timerRef = useRef(null)
+  const { state, dispatch } = useApp()
+  const containerRef = useRef(null)
+  const progressRef = useRef(null)
+  const fillRef = useRef(null)
+  const characterRef = useRef(null)
+  const questRef = useRef(null)
+  const completeRef = useRef(null)
+  const particlesRef = useRef(null)
+  const [currentStep, setCurrentStep] = useState(0)
+  const [isComplete, setIsComplete] = useState(false)
 
-  useEffect(() => {
-    const stepMs = config.intervalMs
-    const totalSteps = config.totalSteps
+  const config = state.deliveryMode === 'rabbit'
+    ? { emoji: '🐰', name: '兔兔', trail: '🐾' }
+    : { emoji: '🚀', name: '火箭', trail: '💫' }
 
-    const run = () => {
-      let step = 0
-      const tick = () => {
-        step++
-        setProgress(step)
-        setEta(Math.max(0, Math.ceil((totalSteps - step) * stepMs / 1000)))
+  useGSAP(() => {
+    gsap.set(containerRef.current, { autoAlpha: 1 })
 
-        const x = 15 + (75 * (step / totalSteps))
-        const y = 20 + (60 * (step / totalSteps))
-        setPos({ x, y })
+    const totalSteps = statusSteps.length
+    let stepIndex = 0
 
-        const msgIdx = Math.min(
-          STATUS_MESSAGES.length - 1,
-          Math.floor((step / totalSteps) * STATUS_MESSAGES.length)
-        )
-        setStatusIdx(msgIdx)
-
-        if (step >= totalSteps) {
-          setComplete(true)
-          dispatch({ type: 'SET_TRACKING_COMPLETE' })
-          return
-        }
-        timerRef.current = setTimeout(tick, stepMs)
+    const showStep = (idx) => {
+      if (idx >= totalSteps) {
+        finish()
+        return
       }
-      timerRef.current = setTimeout(tick, stepMs)
+      const step = statusSteps[idx]
+      setCurrentStep(idx)
+
+      const logItem = document.createElement('div')
+      logItem.className = 'quest-item'
+      logItem.innerHTML = `
+        <span class="quest-check">${idx > 0 ? '✓' : '◉'}</span>
+        <span class="quest-emoji">${step.emoji}</span>
+        <span class="quest-text">${step.text}</span>
+        <span class="quest-time">${step.time}</span>
+      `
+      questRef.current.appendChild(logItem)
+
+      gsap.from(logItem, { x: -20, opacity: 0, duration: 0.35, ease: 'power2.out', clearProps: 'transform' })
+
+      const progress = ((idx + 0.5) / totalSteps) * 100
+      gsap.to(fillRef.current, { width: `${progress}%`, duration: 0.6, ease: 'power2.out' })
+
+      if (characterRef.current) {
+        gsap.to(characterRef.current, {
+          left: `${progress}%`,
+          duration: 1.2,
+          ease: 'power2.inOut',
+        })
+      }
+
+      stepIndex++
+      const delay = idx === 0 ? 800 : 2000
+      setTimeout(() => showStep(stepIndex), delay)
     }
-    run()
+
+    const finish = () => {
+      setIsComplete(true)
+      gsap.to(fillRef.current, { width: '100%', duration: 0.5, ease: 'power2.out' })
+      if (characterRef.current) {
+        gsap.to(characterRef.current, { left: '100%', duration: 0.6, ease: 'power1.in' })
+      }
+      gsap.to(completeRef.current, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(2)' })
+      spawnParticles()
+      setTimeout(() => dispatch({ type: 'SET_TRACKING_COMPLETE' }), 800)
+    }
+
+    const spawnParticles = () => {
+      const container = particlesRef.current
+      if (!container) return
+      for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div')
+        p.className = 'particle'
+        p.style.setProperty('--x', `${Math.random() * 200 - 100}px`)
+        p.style.setProperty('--y', `${Math.random() * -200 - 50}px`)
+        p.style.background = `hsl(${Math.random() * 60 + 10}, 100%, 60%)`
+        container.appendChild(p)
+        gsap.to(p, {
+          x: `+=${Math.random() * 100 - 50}`,
+          y: `+=${Math.random() * -150 - 50}`,
+          opacity: 0,
+          scale: 0,
+          duration: 1.2,
+          ease: 'power2.out',
+          onComplete: () => p.remove(),
+        })
+      }
+    }
+
+    showStep(0)
 
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
+      gsap.killTweensOf('*')
     }
-  }, [config.totalSteps, config.intervalMs, dispatch])
+  }, { scope: containerRef })
 
-  const progressPercent = Math.min(100, (progress / config.totalSteps) * 100)
-
-  const stages = [
-    { label: '訂單已接收', done: progress >= 0 },
-    { label: '取餐中', done: progress >= 5 },
-    { label: '外送中', done: progress >= 8 },
-    { label: '送達', done: complete },
-  ]
-
-  const handleFinish = () => {
+  const handleComplete = () => {
     dispatch({ type: 'SET_PAGE', payload: 'complete' })
   }
 
   return (
-    <div className="page tracking-page">
-      <header className="page-header" style={{ background: theme.primaryBtn }}>
-        <h2>追蹤外送員</h2>
-      </header>
-
-      <div className="tracking-demo-banner">
-        🎮 DEMO 模式 — 這是模擬外送，實際上不會送食物來喔！
-      </div>
-
-      <div className="map-container">
-        <div className="map-grid">
-          <div className="map-roads">
-            <div className="road road-h" style={{ top: '30%' }} />
-            <div className="road road-h" style={{ top: '60%' }} />
-            <div className="road road-v" style={{ left: '25%' }} />
-            <div className="road road-v" style={{ left: '55%' }} />
-            <div className="road road-h" style={{ top: '45%' }} />
-            <div className="road road-v" style={{ left: '75%' }} />
-          </div>
-
-          <div className="map-marker marker-restaurant" style={{ left: '8%', top: '10%' }}>
-            <span className="marker-icon">🏪</span>
-            <span className="marker-label">餐廳</span>
-          </div>
-
-          <div className="map-marker marker-customer" style={{ right: '8%', bottom: '10%' }}>
-            <span className="marker-icon">🏠</span>
-            <span className="marker-label">你家</span>
-          </div>
-
-          <div className="delivery-path">
-            <svg className="path-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path
-                d="M 15 20 C 30 20, 40 50, 50 50 S 70 70, 85 80"
-                fill="none"
-                stroke={theme.brand}
-                strokeWidth="0.8"
-                strokeDasharray="3,2"
-                opacity="0.5"
-              />
-            </svg>
-          </div>
-
-          <div
-            className="map-marker marker-delivery floating"
-            style={{
-              left: `${pos.x}%`,
-              top: `${pos.y}%`,
-            }}
-          >
-            <span className="marker-icon delivery-icon">{config.emoji}</span>
-          </div>
+    <div ref={containerRef} className="tracking-page" style={{ visibility: 'hidden' }}>
+      <div className="game-hud-top">
+        <div className="hud-corner left">
+          <span className="hud-label">{config.name}</span>
+          <span className="hud-value">{config.emoji}</span>
         </div>
-      </div>
-
-      <div className="tracking-info">
-        <div className="tracking-eta">
-          <span className="eta-number">{complete ? '🎉' : eta}</span>
-          <span className="eta-label">{complete ? '送達！' : '秒後送達'}</span>
-        </div>
-
-        <div className="tracking-status">
-          <span className="status-icon" style={{ background: theme.primaryBtn }}>
-            {complete ? '✅' : '🚴'}
-          </span>
-          <span className="status-text">
-            {complete ? '外送完成！' : STATUS_MESSAGES[statusIdx]}
-          </span>
-        </div>
-      </div>
-
-      <div className="tracking-progress">
-        {stages.map((stage, i) => (
-          <div key={i} className={`progress-stage ${stage.done ? 'done' : ''}`}>
-            <div className="progress-dot">
-              {stage.done ? '✅' : i + 1}
+        <div className="hud-center">
+          <div className="game-title">外送任務</div>
+          <div ref={progressRef} className="boss-bar">
+            <div ref={fillRef} className="boss-fill" />
+            <div className="boss-segments">
+              {statusSteps.map((_, i) => (
+                <div key={i} className="boss-seg" />
+              ))}
             </div>
-            <span>{stage.label}</span>
+            <div ref={characterRef} className="boss-character">
+              {config.emoji}
+            </div>
           </div>
-        ))}
+        </div>
+        <div className="hud-corner right">
+          <span className="hud-label">狀態</span>
+          <span className="hud-value pulsing">{isComplete ? '✓' : '▶'}</span>
+        </div>
       </div>
 
-      <div className="delivery-person-card">
-        <div className="person-avatar" style={{ background: theme.primaryBtn }}>
-          {config.emoji}
+      <div className="game-world">
+        <div className="road-bg">
+          <div className="road-lines" />
+          <div className="road-lines second" />
         </div>
-        <div className="person-info">
-          <strong>{config.label}</strong>
-          <span>⭐ 4.9 · 評論 120 則</span>
-        </div>
-        <button className="call-btn" onClick={() => alert('🎮 這是模擬電話，實際上打不通喔！')}>
-          📞 致電
+        <div className="world-grid" />
+      </div>
+
+      <div ref={questRef} className="quest-log" />
+
+      <div ref={completeRef} className="quest-complete" style={{ visibility: 'hidden' }}>
+        <div className="complete-glow" />
+        <span className="complete-icon">🏆</span>
+        <h2 className="complete-title">任務完成！</h2>
+        {state.deliveryMode === 'rabbit'
+          ? <p className="complete-desc">兔兔外送成功送達！🐰</p>
+          : <p className="complete-desc">火箭外送成功送達！🚀</p>
+        }
+      </div>
+
+      <div ref={particlesRef} className="particles-container" />
+
+      <div className="game-footer">
+        <button className="game-btn secondary" onClick={() => dispatch({ type: 'RESET' })}>
+          取消訂單
         </button>
-      </div>
-
-      <div className="tracking-order-info">
-        <div className="info-row">
-          <span>📍 外送地址</span>
-          <span>{state.orderInfo?.address || '台北市信義區'}</span>
-        </div>
-        <div className="info-row">
-          <span>💰 付款方式</span>
-          <span>{state.orderInfo?.payment === 'card' ? '信用卡' : state.orderInfo?.payment === 'transfer' ? '銀行轉帳' : '行動支付'}</span>
-        </div>
-        <div className="info-row">
-          <span>🚴 外送模式</span>
-          <span>{config.label}</span>
-        </div>
-        <div className="info-row">
-          <span>💵 訂單金額</span>
-          <strong>${state.orderInfo?.total || 0}</strong>
-        </div>
-      </div>
-
-      <div className="tracking-footer">
-        {complete ? (
-          <button
-            className="finish-btn"
-            style={{ background: theme.primaryBtn }}
-            onClick={handleFinish}
-          >
-            查看節省成果 🎉
-          </button>
-        ) : (
-          <button className="cancel-btn" onClick={() => {
-            if (confirm('🎮 這是模擬取消，確定要取消嗎？')) {
-              dispatch({ type: 'RESET' })
-            }
-          }}>
-            取消訂單
-          </button>
-        )}
+        <button
+          className={`game-btn primary ${isComplete ? 'active' : ''}`}
+          onClick={handleComplete}
+          disabled={!isComplete}
+        >
+          {isComplete ? '查看成果 →' : '運送中...'}
+        </button>
       </div>
     </div>
   )
