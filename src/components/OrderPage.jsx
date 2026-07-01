@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
 import lottie from 'lottie-web'
+import { animate, createSpring } from 'animejs'
 import cartAnimation from '../assets/cart.json'
 import { restaurants } from '../data/restaurants'
 import { useApp } from '../context/AppContext'
@@ -132,6 +133,85 @@ export default function OrderPage() {
     return () => anim.destroy()
   }, [])
 
+  const cardAnimeIn = useCallback((e) => {
+    const card = e.currentTarget
+    const emoji = card.querySelector('.card-emoji')
+    const children = card.querySelectorAll('.card-body > *')
+    animate(emoji, {
+      scale: [1, 1.25],
+      rotate: [0, -8, 8, -4, 0],
+      duration: 700,
+      ease: createSpring({ stiffness: 280, damping: 10 }),
+    })
+    animate(card, {
+      scale: [1, 1.02],
+      boxShadow: ['0 2px 8px rgba(0,0,0,0.06)', '0 8px 24px rgba(0,0,0,0.1)'],
+      duration: 300,
+      ease: 'outQuad',
+    })
+    animate(children, {
+      translateX: [0, 4],
+      delay: 40,
+      duration: 250,
+      ease: 'outQuad',
+    })
+  }, [])
+
+  const cardAnimeOut = useCallback((e) => {
+    const card = e.currentTarget
+    const emoji = card.querySelector('.card-emoji')
+    const children = card.querySelectorAll('.card-body > *')
+    animate(emoji, { scale: 1, rotate: 0, duration: 400, ease: createSpring({ stiffness: 200, damping: 15 }) })
+    animate(card, { scale: 1, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', duration: 300, ease: 'outQuad' })
+    animate(children, { translateX: 0, delay: 40, duration: 200, ease: 'outQuad' })
+  }, [])
+
+  const handleModeClick = useCallback((mode, e) => {
+    dispatch({ type: 'SET_DELIVERY_MODE', payload: mode })
+    animate(e.currentTarget, {
+      scale: [1, 1.08, 1],
+      duration: 500,
+      ease: createSpring({ stiffness: 400, damping: 12 }),
+    })
+  }, [dispatch])
+
+  useEffect(() => {
+    if (!cartRef.current || totalItems === 0) return
+    animate(cartRef.current, {
+      scale: [1, 1.02, 1],
+      duration: 500,
+      ease: createSpring({ stiffness: 350, damping: 10 }),
+    })
+    animate(cartRef.current.querySelector('.cart-summary-count'), {
+      scale: [1, 1.3, 1],
+      duration: 500,
+      ease: createSpring({ stiffness: 300, damping: 8 }),
+    })
+  }, [totalItems])
+
+  useEffect(() => {
+    const bg = heroRef.current?.querySelector('.hero-grid-bg')
+    if (!bg) return
+    const dots = Array.from({ length: 16 }, () => {
+      const dot = document.createElement('div')
+      dot.style.cssText = `position:absolute;width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.15;left:${Math.random()*100}%;top:${Math.random()*100}%;pointer-events:none`
+      bg.appendChild(dot)
+      return dot
+    })
+    dots.forEach((dot, i) => {
+      animate(dot, {
+        translateY: [0, -(20 + Math.random() * 30)],
+        opacity: [0.15, 0],
+        duration: 2000 + Math.random() * 2000,
+        loop: true,
+        alternate: true,
+        ease: 'inOutSine',
+        delay: i * 150,
+      })
+    })
+    return () => dots.forEach(dot => dot.remove())
+  }, [])
+
   const tagColors = {
     '熱門': '#ff6b35',
     '推薦': '#00d4aa',
@@ -158,14 +238,14 @@ export default function OrderPage() {
       <div ref={modeRef} className="delivery-mode-bar">
         <button
           className={`mode-btn ${state.deliveryMode === 'rabbit' ? 'active' : ''}`}
-          onClick={() => dispatch({ type: 'SET_DELIVERY_MODE', payload: 'rabbit' })}
+          onClick={(e) => handleModeClick('rabbit', e)}
         >
           <span className="mode-icon">🐰</span>
           <span className="mode-label">兔兔外送</span>
         </button>
         <button
           className={`mode-btn ${state.deliveryMode === 'rocket' ? 'active' : ''}`}
-          onClick={() => dispatch({ type: 'SET_DELIVERY_MODE', payload: 'rocket' })}
+          onClick={(e) => handleModeClick('rocket', e)}
         >
           <span className="mode-icon">🚀</span>
           <span className="mode-label">火箭外送</span>
@@ -205,6 +285,8 @@ export default function OrderPage() {
             key={r.id}
             className="restaurant-card"
             onClick={() => { setShowDetail(r); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+            onMouseEnter={cardAnimeIn}
+            onMouseLeave={cardAnimeOut}
           >
             <div className="card-emoji">{r.emoji}</div>
             <div className="card-body">

@@ -166,7 +166,6 @@
 .restaurant-card:hover {
   background: var(--bg-elevated);
   border-color: var(--text-muted);
-  transform: translateX(4px);
 }
 
 .card-emoji {
