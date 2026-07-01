@@ -3,6 +3,8 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
+import lottie from 'lottie-web'
+import cartAnimation from '../assets/cart.json'
 import { restaurants } from '../data/restaurants'
 import { useApp } from '../context/AppContext'
 import RestaurantDetail from './RestaurantDetail'
@@ -22,6 +24,7 @@ export default function OrderPage() {
   const searchRef = useRef(null)
   const listRef = useRef(null)
   const cartRef = useRef(null)
+  const lottieRef = useRef(null)
 
   const totalItems = state.cart.reduce((s, i) => s + i.quantity, 0)
   const totalPrice = state.cart.reduce((s, i) => s + i.price * i.quantity, 0)
@@ -118,6 +121,17 @@ export default function OrderPage() {
     }
   }, [totalItems])
 
+  useEffect(() => {
+    if (!lottieRef.current) return
+    const anim = lottie.loadAnimation({
+      container: lottieRef.current,
+      animationData: cartAnimation,
+      loop: true,
+      autoplay: true,
+    })
+    return () => anim.destroy()
+  }, [])
+
   const tagColors = {
     '熱門': '#ff6b35',
     '推薦': '#00d4aa',
@@ -131,6 +145,7 @@ export default function OrderPage() {
       <div ref={heroRef} className="order-hero">
         <div className="hero-grid-bg" />
         <div className="hero-content">
+          <div ref={lottieRef} className="hero-lottie" />
           <h1 ref={titleRef} className="hero-title" style={{ visibility: 'hidden' }}>
             食物不會來
           </h1>
@@ -140,7 +155,7 @@ export default function OrderPage() {
         </div>
       </div>
 
-      <div ref={modeRef} className="delivery-mode-bar" style={{ opacity: 0 }}>
+      <div ref={modeRef} className="delivery-mode-bar">
         <button
           className={`mode-btn ${state.deliveryMode === 'rabbit' ? 'active' : ''}`}
           onClick={() => dispatch({ type: 'SET_DELIVERY_MODE', payload: 'rabbit' })}
@@ -157,7 +172,7 @@ export default function OrderPage() {
         </button>
       </div>
 
-      <div ref={searchRef} className="search-bar" style={{ opacity: 0 }}>
+      <div ref={searchRef} className="search-bar">
         <span className="search-icon">⌕</span>
         <input
           type="text"
@@ -167,7 +182,7 @@ export default function OrderPage() {
         />
       </div>
 
-      <div ref={cartRef} className="cart-summary" style={{ opacity: 0, scale: 0.95 }}>
+      <div ref={cartRef} className="cart-summary">
         <div className="cart-summary-left">
           <span className="cart-summary-count">{totalItems} 項</span>
           <span className="cart-summary-divider" />
